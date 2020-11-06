@@ -3,27 +3,34 @@ import apiService from './js/apiService';
 import refs from './js/refs';
 import debounce from 'lodash.debounce';
 import templateGallery from './templates/templateGallery.hbs';
+import showHide from './js/showHide';
 
-import * as basicLightbox from 'basiclightbox';
-import '../node_modules/basiclightbox/dist/basicLightbox.min.css';
 
 refs.search.addEventListener('input', debounce((e) => {
 
   if (e.target.value === '') {
     refs.gallery.innerHTML = '';
-    refs.loadMoreBtn.classList.add('is-hidden');
+    showHide.hideElement(refs.loadMoreBtn);
     return;
   }
+  if (refs.loadMoreBtn.disabled === true) {
+    refs.loadMoreBtn.disabled = false;
+    refs.btnText.textContent = 'Показать еще';
 
-  refs.loadMoreBtn.classList.remove('is-hidden')
+}
+
+  showHide.showElement(refs.loadMoreBtn);
   apiService.query = e.target.value;
+  apiService.resetPage();
 
   apiService.toGetFetch().then(data =>
-    refs.gallery.innerHTML = templateGallery(data));
+    refs.gallery.innerHTML = templateGallery(data),
+
+    )
 
 }, 500))
 
-refs.loadMoreBtn.addEventListener('click', () => {
+refs.loadMoreBtn.addEventListener("click", () => {
   apiService.setPage();
 
   refs.loadMoreBtn.disabled = true;
@@ -34,12 +41,17 @@ refs.loadMoreBtn.addEventListener('click', () => {
     refs.loadMoreBtn.disabled = false;
 })
 
-// refs.gallery.addEventListener('click', (e) => {
-//   console.log(e.target);
 
-//   let bigImage = e.target.dataset.largeImage;
-//   console.log(bigImage);
-//   refs.jsLightbox.classList.add('is-open');
-//   refs.lightboxImage.src = bigImage;
-// })
+refs.backToTop.addEventListener('click', () => {
+  scrollTo({
+      top: 0,
+      behavior: 'smooth'
+  })
+});
 
+refs.goToBottom.addEventListener('click', () => {
+  scrollTo({
+      top: 1000,
+      behavior: 'auto'
+  })
+})
