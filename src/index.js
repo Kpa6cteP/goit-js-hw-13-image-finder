@@ -23,10 +23,10 @@ refs.search.addEventListener('input', debounce((e) => {
   apiService.query = e.target.value;
   apiService.resetPage();
 
-  apiService.toGetFetch().then(data =>
+  apiService.toGetFetch().then(data => {
     refs.gallery.innerHTML = templateGallery(data),
-
-    )
+    disableLoadBtn(data)
+  })
 
 }, 500))
 
@@ -35,12 +35,13 @@ refs.loadMoreBtn.addEventListener("click", () => {
 
   refs.loadMoreBtn.disabled = true;
 
-  apiService.toGetFetch().then(data =>
-    refs.gallery.insertAdjacentHTML('beforeend', templateGallery(data)));
+  apiService.toGetFetch().then(data => {
+    refs.gallery.insertAdjacentHTML('beforeend', templateGallery(data)),
+    disableLoadBtn(data)
+  }),
 
     refs.loadMoreBtn.disabled = false;
 })
-
 
 refs.backToTop.addEventListener('click', () => {
   scrollTo({
@@ -51,7 +52,13 @@ refs.backToTop.addEventListener('click', () => {
 
 refs.goToBottom.addEventListener('click', () => {
   scrollTo({
-      top: 1000,
+      top: document.body.clientHeight,
       behavior: 'auto'
   })
 })
+
+function disableLoadBtn (data) {
+  if ( data.length < 12 ) {
+    showHide.hideElement(refs.loadMoreBtn)
+  }
+}
